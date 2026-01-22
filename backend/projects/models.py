@@ -12,15 +12,23 @@ class Project(models.Model):
     def __str__(self):
         return self.name
 
+class Actor(models.Model):
+    """
+    Represents a person, volunteer, or organization that can perform actions.
+    """
+    name = models.CharField(max_length=100)
+    user = models.OneToOneField(User, null=True, blank=True, on_delete=models.SET_NULL)
+    role = models.CharField(max_length=50, default="volunteer")  # e.g., volunteer, staff, org
+
+    def __str__(self):
+        return f"{self.name} ({self.role})"
+
 class Action(models.Model):
-    project = models.ForeignKey(
-        Project,
-        on_delete=models.CASCADE,
-        related_name="actions"
-    )
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="actions")
     action_type = models.CharField(max_length=100)
     status = models.CharField(max_length=50, default="pending")
     context = models.JSONField(default=dict, blank=True)
+    actor = models.ForeignKey(Actor, null=True, blank=True, on_delete=models.SET_NULL, related_name="actions")
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
