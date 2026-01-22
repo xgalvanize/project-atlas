@@ -13,28 +13,15 @@ class Project(models.Model):
         return self.name
 
 class Action(models.Model):
-    """
-    Generalized unit of work.
-    Domain-agnostic by design.
-    """
-
-    action_type = models.CharField(
-        max_length=50,
-        help_text="Free-form category (assign, deliver, deploy, inspect, etc.)"
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        related_name="actions"
     )
-
-    status = models.CharField(
-        max_length=20,
-        default="pending"
-    )
-
-    context = models.JSONField(
-        null=True,
-        blank=True,
-        help_text="Arbitrary structured data for this action"
-    )
-
+    action_type = models.CharField(max_length=100)
+    status = models.CharField(max_length=50, default="pending")
+    context = models.JSONField(default=dict, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.action_type} [{self.status}]"
+        return f"{self.action_type} ({self.status})"
