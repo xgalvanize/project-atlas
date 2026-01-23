@@ -2,6 +2,7 @@ import graphene
 from graphene_django import DjangoObjectType
 from django.contrib.auth.models import User
 from graphene.types.generic import GenericScalar
+from .tasks import process_action
 
 from .models import Project, Action, Actor
 
@@ -45,9 +46,13 @@ class CreateAction(graphene.Mutation):
 
     def mutate(self, info, project_id, action_type, status="pending", context=None, actor_id=None):
         project = Project.objects.get(id=project_id)
+
         actor = None
         if actor_id:
-            actor = Actor.objects.get(id=actor_id)
+            try:
+                actor = Actor.objects.get(id=actor_id)
+            except Actor.DoesNotExist:
+                raise Exception("Invalid actor_id")
 
         action = Action.objects.create(
             project=project,
@@ -57,7 +62,10 @@ class CreateAction(graphene.Mutation):
             actor=actor
         )
 
+        process_action.delay(action.id)
+
         return CreateAction(action=action)
+
 
 # class CreateAction(graphene.Mutation):
 #     class Arguments:
