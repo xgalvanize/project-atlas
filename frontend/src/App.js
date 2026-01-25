@@ -31,6 +31,7 @@ const UPDATE_ACTION_STATUS = gql`
 export default function App() {
   const { data, loading, error } = useQuery(GET_PROJECTS);
   const [updateStatus] = useMutation(UPDATE_ACTION_STATUS);
+  
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
@@ -42,23 +43,23 @@ export default function App() {
           <ul>
             {project.actions.map((action) => (
               <>
-              <li key={action.id}>{action.actionType} - {action.status}</li>
-              <select
-  value={action.status}
-  onChange={(e) => {
-    updateStatus({
-      variables: {
-        actionId: action.id,
-        status: e.target.value,
-      },
-    });
-  }}
->
-  <option value="pending">pending</option>
-  <option value="in_progress">in_progress</option>
-  <option value="completed">completed</option>
-</select>
-</>
+                <li key={action.id}>{action.actionType} - {action.status} - {action.actor?.name || 'Unassigned'}</li>
+                <select
+                  value={action.status}
+                  onChange={(e) => {
+                    updateStatus({
+                      variables: {
+                        actionId: action.id,
+                        status: e.target.value,
+                      },
+                    });
+                  }}
+                >
+                  <option value="pending">pending</option>
+                  <option value="in_progress">in_progress</option>
+                  <option value="completed">completed</option>
+                </select>
+              </>
             ))}
           </ul>
         </div>

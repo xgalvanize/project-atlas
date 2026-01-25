@@ -2,6 +2,9 @@ from django.db import models
 
 # Create your models here.
 from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class Project(models.Model):
     name = models.CharField(max_length=255)
@@ -11,6 +14,20 @@ class Project(models.Model):
 
     def __str__(self):
         return self.name
+    
+class Task(models.Model):
+    project = models.ForeignKey(
+        Project,
+        related_name="tasks",
+        on_delete=models.CASCADE
+    )
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    is_completed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
 
 class Actor(models.Model):
     """
@@ -28,8 +45,9 @@ class Action(models.Model):
     action_type = models.CharField(max_length=100)
     status = models.CharField(max_length=50, default="pending")
     context = models.JSONField(default=dict, blank=True)
-    actor = models.ForeignKey(Actor, null=True, blank=True, on_delete=models.SET_NULL, related_name="actions")
+    actor = models.ForeignKey(Actor, null=True, blank=True, on_delete=models.SET_NULL, related_name="assigned_actions")
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.action_type} ({self.status})"
+    

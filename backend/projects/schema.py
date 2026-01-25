@@ -1,21 +1,25 @@
 import graphene
 from graphene_django import DjangoObjectType
-from django.contrib.auth.models import User
 from graphene.types.generic import GenericScalar
 from .tasks import process_action
+from .models import Project, Action, Actor, Task
+from django.contrib.auth.models import User
 
-from .models import Project, Action, Actor
 
-
+# ---------------------
+# GraphQL Types
+# ---------------------
 class UserType(DjangoObjectType):
     class Meta:
         model = User
         fields = ("id", "username")
 
+
 class ActorType(DjangoObjectType):
     class Meta:
         model = Actor
         fields = ("id", "name", "role", "user")
+
 
 class ActionType(DjangoObjectType):
     context = GenericScalar()
@@ -24,16 +28,25 @@ class ActionType(DjangoObjectType):
         model = Action
         fields = ("id", "action_type", "status", "context", "actor", "created_at")
 
+class TaskType(DjangoObjectType):
+    class Meta:
+        model = Task
+        fields = ("id", "title", "description", "is_completed", "created_at")
+
 class ProjectType(DjangoObjectType):
     actions = graphene.List(ActionType)
 
     class Meta:
         model = Project
-        fields = ("id", "name", "owner", "actions")
+        fields = ("id", "name", "description", "created_at", "tasks")
 
     def resolve_actions(self, info):
         return self.actions.all()
 
+
+# ---------------------
+# Mutations
+# ---------------------
 class CreateAction(graphene.Mutation):
     class Arguments:
         project_id = graphene.ID(required=True)
@@ -49,10 +62,7 @@ class CreateAction(graphene.Mutation):
 
         actor = None
         if actor_id:
-            try:
-                actor = Actor.objects.get(id=actor_id)
-            except Actor.DoesNotExist:
-                raise Exception("Invalid actor_id")
+            actor = Actor.objects.get(id=actor_id)
 
         action = Action.objects.create(
             project=project,
@@ -62,9 +72,11 @@ class CreateAction(graphene.Mutation):
             actor=actor
         )
 
+        # Background processing
         process_action.delay(action.id)
 
         return CreateAction(action=action)
+
 
 class UpdateActionStatus(graphene.Mutation):
     class Arguments:
@@ -80,16 +92,53 @@ class UpdateActionStatus(graphene.Mutation):
         return UpdateActionStatus(action=action)
 
 
-class ProjectsQuery(graphene.ObjectType):
-    projects = graphene.List(ProjectType)
+class AssignActionActor(graphene.Mutation):
+    class Arguments:
+        action_id = graphene.ID(required=True)
+        actor_id = graphene.ID(required=True)
 
-    def resolve_projects(root, info):
+    action = graphene.Field(ActionType)
+
+    def mutate(self, info, action_id, actor_id):
+        action = Action.objects.get(id=action_id)
+        actor = Actor.objects.get(id=actor_id)
+        action.actor = actor
+        action.save()
+        return AssignActionActor(action=action)
+
+class CreateTask(graphene.Mutation):
+    task = graphene.Field(TaskType)
+
+    class Arguments:
+        project_id = graphene.ID(required=True)
+        title = graphene.String(required=True)
+        description = graphene.String()
+
+    def mutate(self, info, project_id, title, description=""):
+        project = Project.objects.get(pk=project_id)
+        task = Task.objects.create(
+            project=project,
+            title=title,
+            description=description
+        )
+        return CreateTask(task=task)
+
+# ---------------------
+# Queries
+# ---------------------
+class Query(graphene.ObjectType):
+    all_projects = graphene.List(ProjectType)
+    all_tasks = graphene.List(TaskType)
+    def resolve_all_projects(root, info):
         return Project.objects.all()
 
-# class ProjectsMutation(graphene.ObjectType):
-#     create_action = CreateAction.Field()
-
-class ProjectsMutation(graphene.ObjectType):
+    def resolve_all_tasks(root, info):
+        return Task.objects.all()
+# ---------------------
+# Mutation Root
+# ---------------------
+class Mutation(graphene.ObjectType):
     create_action = CreateAction.Field()
     update_action_status = UpdateActionStatus.Field()
-
+    assign_action_actor = AssignActionActor.Field()
+    create_task = CreateTask.Field()
