@@ -115,13 +115,31 @@ class CreateTask(graphene.Mutation):
         description = graphene.String()
 
     def mutate(self, info, project_id, title, description=""):
-        project = Project.objects.get(pk=project_id)
+        try:
+            project = Project.objects.get(pk=project_id)
+        except Project.DoesNotExist:
+            raise Exception("Project with the given ID does not exist")
+
         task = Task.objects.create(
             project=project,
             title=title,
             description=description
         )
         return CreateTask(task=task)
+
+class CreateProject(graphene.Mutation):
+    project = graphene.Field(ProjectType)
+
+    class Arguments:
+        name = graphene.String(required=True)
+        description = graphene.String()
+
+    def mutate(self, info, name, description=""):
+        project = Project.objects.create(
+            name=name,
+            description=description
+        )
+        return CreateProject(project=project)
 
 # ---------------------
 # Queries
@@ -138,6 +156,7 @@ class Query(graphene.ObjectType):
 # Mutation Root
 # ---------------------
 class Mutation(graphene.ObjectType):
+    create_project = CreateProject.Field()
     create_action = CreateAction.Field()
     update_action_status = UpdateActionStatus.Field()
     assign_action_actor = AssignActionActor.Field()
