@@ -2,7 +2,7 @@ import graphene
 from graphene_django import DjangoObjectType
 from graphene.types.generic import GenericScalar
 from .tasks import process_action
-from .models import Project, Action, Actor, Task
+from .models import Project, Action, Actor, Task, TaskAction
 from django.contrib.auth.models import User
 
 
@@ -31,7 +31,15 @@ class ActionType(DjangoObjectType):
 class TaskType(DjangoObjectType):
     class Meta:
         model = Task
-        fields = ("id", "title", "description", "is_completed", "created_at")
+        fields = (
+            "id",
+            "title",
+            "description",
+            "is_completed",
+            "created_at",
+            "actions",
+        )
+
 
 class ProjectType(DjangoObjectType):
     actions = graphene.List(ActionType)
@@ -43,6 +51,10 @@ class ProjectType(DjangoObjectType):
     def resolve_actions(self, info):
         return self.actions.all()
 
+class TaskActionType(DjangoObjectType):
+    class Meta:
+        model = TaskAction
+        fields = ("id", "description", "created_at")
 
 # ---------------------
 # Mutations
@@ -127,6 +139,32 @@ class CreateTask(graphene.Mutation):
         )
         return CreateTask(task=task)
 
+class UpdateTask(graphene.Mutation):
+    task = graphene.Field(TaskType)
+
+    class Arguments:
+        task_id = graphene.ID(required=True)
+        title = graphene.String()
+        description = graphene.String()
+        is_completed = graphene.Boolean()
+
+    def mutate(self, info, task_id, title=None, description=None, is_completed=None):
+        try:
+            task = Task.objects.get(pk=task_id)
+        except Task.DoesNotExist:
+            raise Exception("Task with the given ID does not exist")
+
+        if title is not None:
+            task.title = title
+        if description is not None:
+            task.description = description
+        if is_completed is not None:
+            task.is_completed = is_completed
+
+        task.save()
+        return UpdateTask(task=task)
+
+
 class CreateProject(graphene.Mutation):
     project = graphene.Field(ProjectType)
 
@@ -140,6 +178,26 @@ class CreateProject(graphene.Mutation):
             description=description
         )
         return CreateProject(project=project)
+
+class CreateTaskAction(graphene.Mutation):
+    action = graphene.Field(TaskActionType)
+
+    class Arguments:
+        task_id = graphene.ID(required=True)
+        description = graphene.String(required=True)
+
+    def mutate(self, info, task_id, description):
+        try:
+            task = Task.objects.get(pk=task_id)
+        except Task.DoesNotExist:
+            raise Exception("Task does not exist")
+
+        action = TaskAction.objects.create(
+            task=task,
+            description=description
+        )
+        return CreateTaskAction(action=action)
+
 
 # ---------------------
 # Queries
@@ -161,3 +219,5 @@ class Mutation(graphene.ObjectType):
     update_action_status = UpdateActionStatus.Field()
     assign_action_actor = AssignActionActor.Field()
     create_task = CreateTask.Field()
+    update_task = UpdateTask.Field()
+    create_task_action = CreateTaskAction.Field()

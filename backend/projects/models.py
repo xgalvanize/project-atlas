@@ -51,3 +51,14 @@ class Action(models.Model):
     def __str__(self):
         return f"{self.action_type} ({self.status})"
     
+class TaskAction(models.Model):
+    task = models.ForeignKey(
+        Task,
+        related_name="actions",
+        on_delete=models.CASCADE
+    )
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Action for Task {self.task_id}"
