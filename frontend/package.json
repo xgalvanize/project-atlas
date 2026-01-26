@@ -9,6 +9,7 @@
     "@apollo/client": "^4.1.2",
     "graphql": "^16.6.0"
   },
+  "proxy": "http://localhost:8000",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

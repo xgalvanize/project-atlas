@@ -25,8 +25,7 @@ SECRET_KEY = 'django-insecure-niq*4iar7o)@o=s9+)fur*brgqukkkjz7j+#%dik7k-t=pni=i
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '10.0.0.145', '99.227.9.76']
 
 # Application definition
 
@@ -149,9 +148,12 @@ CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://10.0.0.145:3000",
+    "http://99.227.9.76:3000",   # Optional but helpful
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://10.0.0.145:3000",
 ]

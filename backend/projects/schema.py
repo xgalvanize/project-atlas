@@ -35,10 +35,11 @@ class TaskType(DjangoObjectType):
             "id",
             "title",
             "description",
-            "is_completed",
+            "status",
             "created_at",
             "actions",
         )
+
 
 
 class ProjectType(DjangoObjectType):
@@ -203,8 +204,8 @@ class CreateTaskAction(graphene.Mutation):
 # Queries
 # ---------------------
 class Query(graphene.ObjectType):
-    all_projects = graphene.List(ProjectType)
-    all_tasks = graphene.List(TaskType)
+    projects = graphene.List(ProjectType)
+    tasks = graphene.List(TaskType)
     def resolve_all_projects(root, info):
         return Project.objects.all()
 
