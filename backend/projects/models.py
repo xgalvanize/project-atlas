@@ -26,6 +26,16 @@ class Task(models.Model):
     is_completed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Status(models.TextChoices):
+        PENDING = "PENDING"
+        IN_PROGRESS = "IN_PROGRESS"
+        DONE = "DONE"
+
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.PENDING
+    )
     def __str__(self):
         return self.title
 
