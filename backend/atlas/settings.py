@@ -37,10 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'graphene_django',
+    "corsheaders",
         # Local apps
     "projects",
-    # "tasks",
-    "corsheaders",
+    "tasks",
+    "actions",
+    
 ]
 
 MIDDLEWARE = [

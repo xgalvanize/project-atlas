@@ -1,27 +1,13 @@
-# tasks/schema.py (or actions/schema.py later)
-
 import graphene
-from .models import Task, TaskAction
 from graphene_django import DjangoObjectType
+from .models import TaskAction
 
 class TaskActionType(DjangoObjectType):
     class Meta:
         model = TaskAction
-        fields = ("id", "description", "created_at")
+        fields = ("id", "task", "actor", "description", "created_at")
 
-
-class TaskType(DjangoObjectType):
-    class Meta:
-        model = Task
-        fields = (
-            "id",
-            "title",
-            "description",
-            "status",      # <-- THIS IS REQUIRED
-            "created_at",
-            "actions",
-        )
-
+# Mutation for creating an action
 class CreateTaskAction(graphene.Mutation):
     class Arguments:
         task_id = graphene.ID(required=True)
@@ -30,6 +16,7 @@ class CreateTaskAction(graphene.Mutation):
     action = graphene.Field(TaskActionType)
 
     def mutate(self, info, task_id, description):
+        from tasks.models import Task
         task = Task.objects.get(pk=task_id)
         action = TaskAction.objects.create(
             task=task,

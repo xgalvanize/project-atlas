@@ -1,27 +1,28 @@
 import graphene
 from graphene_django import DjangoObjectType
-from projects.models import Project, Task, TaskAction
-
+from projects.models import Project
+from tasks.models import Task, TaskAction
+from tasks.schema import TaskActionType, TaskType
 # -----------------------------
 # GraphQL Types
 # -----------------------------
-class TaskActionType(DjangoObjectType):
-    class Meta:
-        model = TaskAction
-        fields = ("id", "description", "created_at")
+# class TaskActionType(DjangoObjectType):
+#     class Meta:
+#         model = TaskAction
+#         fields = ("id", "description", "created_at")
 
 
-class TaskType(DjangoObjectType):
-    class Meta:
-        model = Task
-        fields = (
-            "id",
-            "title",
-            "description",
-            "status",      # <-- THIS IS REQUIRED
-            "created_at",
-            "actions",
-        )
+# class TaskType(DjangoObjectType):
+#     class Meta:
+#         model = Task
+#         fields = (
+#             "id",
+#             "title",
+#             "description",
+#             "status",      # <-- THIS IS REQUIRED
+#             "created_at",
+#             "actions",
+#         )
 
 
 class ProjectType(DjangoObjectType):

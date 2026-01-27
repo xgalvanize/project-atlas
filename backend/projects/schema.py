@@ -7,10 +7,10 @@ from .models import Project, Task, TaskAction
 # GraphQL Types
 # ——————————————————————
 
-class TaskActionType(DjangoObjectType):
-    class Meta:
-        model = TaskAction
-        fields = ("id", "description", "created_at")
+# class TaskActionType(DjangoObjectType):
+#     class Meta:
+#         model = TaskAction
+#         fields = ("id", "description", "created_at")
 
 
 # class TaskType(DjangoObjectType):
