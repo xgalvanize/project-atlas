@@ -1,8 +1,31 @@
 import graphene
-from graphene_django import DjangoObjectType
-from projects.models import Project
-from tasks.models import Task, TaskAction
-from tasks.schema import TaskActionType, TaskType
+import projects.schema
+import tasks.schema
+import actions.schema
+
+class Mutation(
+    projects.schema.Mutation,
+    tasks.schema.Mutation,
+    actions.schema.Mutation,
+    graphene.ObjectType,
+):
+    pass
+
+class Query(
+    projects.schema.Query,
+    tasks.schema.Query,
+    actions.schema.Query,
+    graphene.ObjectType,
+):
+    pass
+
+schema = graphene.Schema(query=Query, mutation=Mutation)
+
+# import graphene
+# from graphene_django import DjangoObjectType
+# from projects.models import Project
+# from tasks.models import Task, TaskAction
+# from tasks.schema import TaskActionType, TaskType
 # -----------------------------
 # GraphQL Types
 # -----------------------------
@@ -25,94 +48,94 @@ from tasks.schema import TaskActionType, TaskType
 #         )
 
 
-class ProjectType(DjangoObjectType):
-    class Meta:
-        model = Project
-        fields = ("id", "name", "description", "created_at", "tasks")
+# class ProjectType(DjangoObjectType):
+#     class Meta:
+#         model = Project
+#         fields = ("id", "name", "description", "created_at", "tasks")
 
 
 # -----------------------------
 # Queries
 # -----------------------------
-class Query(graphene.ObjectType):
-    projects = graphene.List(ProjectType)
-    tasks = graphene.List(TaskType)
+# class Query(graphene.ObjectType):
+#     projects = graphene.List(ProjectType)
+#     tasks = graphene.List(TaskType)
 
-    def resolve_projects(root, info):
-        return Project.objects.all()
+#     def resolve_projects(root, info):
+#         return Project.objects.all()
 
-    def resolve_tasks(root, info):
-        return Task.objects.all()
+#     def resolve_tasks(root, info):
+#         return Task.objects.all()
 
 
 # -----------------------------
 # Mutations
 # -----------------------------
-class CreateProject(graphene.Mutation):
-    project = graphene.Field(ProjectType)
+# class CreateProject(graphene.Mutation):
+#     project = graphene.Field(ProjectType)
 
-    class Arguments:
-        name = graphene.String(required=True)
-        description = graphene.String()
+#     class Arguments:
+#         name = graphene.String(required=True)
+#         description = graphene.String()
 
-    def mutate(self, info, name, description=""):
-        project = Project.objects.create(name=name, description=description)
-        return CreateProject(project=project)
-
-
-class CreateTask(graphene.Mutation):
-    task = graphene.Field(TaskType)
-
-    class Arguments:
-        project_id = graphene.ID(required=True)
-        title = graphene.String(required=True)
-        description = graphene.String()
-
-    def mutate(self, info, project_id, title, description=""):
-        project = Project.objects.get(pk=project_id)
-        task = Task.objects.create(
-            project=project,
-            title=title,
-            description=description
-        )
-        return CreateTask(task=task)
+#     def mutate(self, info, name, description=""):
+#         project = Project.objects.create(name=name, description=description)
+#         return CreateProject(project=project)
 
 
-class UpdateTask(graphene.Mutation):
-    task = graphene.Field(TaskType)
+# class CreateTask(graphene.Mutation):
+#     task = graphene.Field(TaskType)
 
-    class Arguments:
-        task_id = graphene.ID(required=True)
-        title = graphene.String()
-        description = graphene.String()
-        status = graphene.String()
+#     class Arguments:
+#         project_id = graphene.ID(required=True)
+#         title = graphene.String(required=True)
+#         description = graphene.String()
 
-    def mutate(self, info, task_id, title=None, description=None, status=None):
-        task = Task.objects.get(pk=task_id)
-        if title is not None:
-            task.title = title
-        if description is not None:
-            task.description = description
-        if status is not None:
-            task.status = status
-        task.save()
-        return UpdateTask(task=task)
+#     def mutate(self, info, project_id, title, description=""):
+#         project = Project.objects.get(pk=project_id)
+#         task = Task.objects.create(
+#             project=project,
+#             title=title,
+#             description=description
+#         )
+#         return CreateTask(task=task)
 
 
-class Mutation(graphene.ObjectType):
-    create_project = CreateProject.Field()
-    create_task = CreateTask.Field()
-    update_task = UpdateTask.Field()
+# class UpdateTask(graphene.Mutation):
+#     task = graphene.Field(TaskType)
+
+#     class Arguments:
+#         task_id = graphene.ID(required=True)
+#         title = graphene.String()
+#         description = graphene.String()
+#         status = graphene.String()
+
+#     def mutate(self, info, task_id, title=None, description=None, status=None):
+#         task = Task.objects.get(pk=task_id)
+#         if title is not None:
+#             task.title = title
+#         if description is not None:
+#             task.description = description
+#         if status is not None:
+#             task.status = status
+#         task.save()
+#         return UpdateTask(task=task)
+
+
+# class Mutation(graphene.ObjectType):
+#     create_project = CreateProject.Field()
+#     create_task = CreateTask.Field()
+#     update_task = UpdateTask.Field()
 
 
 # -----------------------------
 # Final Schema
 # -----------------------------
-schema = graphene.Schema(
-    query=Query,
-    mutation=Mutation,
-    types=[ProjectType, TaskType, TaskActionType]  # <-- Force Graphene to use these exact classes
-)
+# schema = graphene.Schema(
+#     query=Query,
+#     mutation=Mutation,
+#     types=[ProjectType, TaskType, TaskActionType]  # <-- Force Graphene to use these exact classes
+# )
 
 # import graphene
 # from projects.models import Project, Task, TaskAction
