@@ -159,3 +159,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://10.0.0.145:3000",
 ]
+
+GRAPHENE = {
+    "SCHEMA": "atlas.schema.schema"
+}

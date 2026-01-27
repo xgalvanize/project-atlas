@@ -3,14 +3,6 @@ import projects.schema
 import tasks.schema
 import actions.schema
 
-class Mutation(
-    projects.schema.Mutation,
-    tasks.schema.Mutation,
-    actions.schema.Mutation,
-    graphene.ObjectType,
-):
-    pass
-
 class Query(
     projects.schema.Query,
     tasks.schema.Query,
@@ -19,7 +11,16 @@ class Query(
 ):
     pass
 
+class Mutation(
+    projects.schema.Mutation,
+    tasks.schema.Mutation,
+    actions.schema.Mutation,
+    graphene.ObjectType,
+):
+    pass
+
 schema = graphene.Schema(query=Query, mutation=Mutation)
+
 
 # import graphene
 # from graphene_django import DjangoObjectType

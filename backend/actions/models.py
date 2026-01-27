@@ -11,4 +11,4 @@ class TaskAction(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.task.title} - {self.description[:30]}"
+        return f"{self.task.title} – {self.description[:30]}"
