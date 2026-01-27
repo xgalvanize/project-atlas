@@ -161,5 +161,9 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 GRAPHENE = {
-    "SCHEMA": "atlas.schema.schema"
+    "SCHEMA": "projects.schema.schema",
+    "MIDDLEWARE": [
+        "graphene_django.debug.DjangoDebugMiddleware",
+    ],
 }
+
