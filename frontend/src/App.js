@@ -4,7 +4,6 @@ import { useQuery, useMutation } from "@apollo/client/react";
 import { gql } from "@apollo/client";
 import Layout from "./layout/Layout";
 import RequireAuth from "./auth/RequireAuth";
-
 import Dashboard from "./pages/Dashboard";
 import LoginPage from "./auth/LoginPage";
 // -----------------------------
