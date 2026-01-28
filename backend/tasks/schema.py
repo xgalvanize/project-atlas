@@ -1,10 +1,16 @@
 import graphene
 from graphene_django import DjangoObjectType
+from django.contrib.auth import get_user_model
 from .models import Task
 from projects.models import Project
-
+User = get_user_model()
+class UserType(DjangoObjectType):
+    class Meta:
+        model = User
+        fields = ("id", "username", "email")  # whatever fields you want exposed
 
 class TaskType(DjangoObjectType):
+    createdBy = graphene.Field(lambda: UserType)
     class Meta:
         model = Task
         fields = (
@@ -13,8 +19,11 @@ class TaskType(DjangoObjectType):
             "description",
             "status",
             "created_at",
+            "created_by",
             "project",
         )
+    def resolve_createdBy(self, info):
+        return self.created_by
 
 
 class CreateTask(graphene.Mutation):
