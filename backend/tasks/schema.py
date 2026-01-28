@@ -51,6 +51,25 @@ class CreateTask(graphene.Mutation):
 
         return CreateTask(task=task)
 
+class UpdateTaskStatus(graphene.Mutation):
+    task = graphene.Field(TaskType)
+
+    class Arguments:
+        task_id = graphene.ID(required=True)
+        status = graphene.String(required=True)
+
+    def mutate(self, info, task_id, status):
+        user = info.context.user
+        if user.is_anonymous:
+            raise Exception("Authentication required")
+
+        task = Task.objects.get(id=task_id)
+
+        task.status = status
+        task.save()
+
+        return UpdateTaskStatus(task=task)
+
 
 class Query(graphene.ObjectType):
     tasks = graphene.List(TaskType, project_id=graphene.ID())
@@ -63,3 +82,4 @@ class Query(graphene.ObjectType):
 
 class Mutation(graphene.ObjectType):
     create_task = CreateTask.Field()
+    update_task_status = UpdateTaskStatus.Field()
