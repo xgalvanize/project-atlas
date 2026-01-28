@@ -1,7 +1,10 @@
 import React from "react";
-import {useQuery, useMutation} from "@apollo/client/react";
+import { useQuery, useMutation } from "@apollo/client/react";
 import { gql } from "@apollo/client";
+import Layout from "./layout/Layout";
+import RequireAuth from "./auth/RequireAuth";
 
+import Dashboard from "./pages/Dashboard";
 // -----------------------------
 // GraphQL Query
 // -----------------------------
@@ -56,48 +59,55 @@ export default function App() {
   if (error) return <p>Error: {error.message}</p>;
 
   return (
-    <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
-      <h1>Project Atlas</h1>
-
-      {data.projects.map((project) => (
-        <div key={project.id} style={{ marginBottom: "2rem" }}>
-          <h2>{project.name}</h2>
-
-          {project.tasks.length === 0 ? (
-            <p>No tasks yet.</p>
-          ) : (
-            <ul>
-              {project.tasks.map((task) => (
-                <li key={task.id}>
-                  <strong>{task.title}</strong>
-
-                  <br />
-
-                  Status:{" "}
-                  <select
-                    value={task.status}
-                    onChange={(e) => {
-                      updateTaskStatus({
-                        variables: {
-                          taskId: task.id,
-                          status: e.target.value,
-                        },
-                      }).then(() => refetch());
-                    }}
-                  >
-                    <option value="pending">pending</option>
-                    <option value="in_progress">in_progress</option>
-                    <option value="done">done</option>
-                  </select>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      ))}
-    </div>
+    <Layout>
+      <RequireAuth>
+        <Dashboard />
+      </RequireAuth>
+    </Layout>
   );
 }
+//     <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
+//       <h1>Project Atlas</h1>
+
+//       {data.projects.map((project) => (
+//         <div key={project.id} style={{ marginBottom: "2rem" }}>
+//           <h2>{project.name}</h2>
+
+//           {project.tasks.length === 0 ? (
+//             <p>No tasks yet.</p>
+//           ) : (
+//             <ul>
+//               {project.tasks.map((task) => (
+//                 <li key={task.id}>
+//                   <strong>{task.title}</strong>
+
+//                   <br />
+
+//                   Status:{" "}
+//                   <select
+//                     value={task.status}
+//                     onChange={(e) => {
+//                       updateTaskStatus({
+//                         variables: {
+//                           taskId: task.id,
+//                           status: e.target.value,
+//                         },
+//                       }).then(() => refetch());
+//                     }}
+//                   >
+//                     <option value="pending">pending</option>
+//                     <option value="in_progress">in_progress</option>
+//                     <option value="done">done</option>
+//                   </select>
+//                 </li>
+//               ))}
+//             </ul>
+//           )}
+//         </div>
+//       ))}
+//     </div>
+//   );
+// }
 
 
 // import React from "react";
