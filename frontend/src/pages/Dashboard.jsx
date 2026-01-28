@@ -1,14 +1,10 @@
 import React from "react";
+import ProjectsPage from "./ProjectsPage";
 
 export default function Dashboard() {
   return (
     <div>
-      <h1>Atlas Dashboard</h1>
-      <p>Welcome. You are logged in.</p>
-
-      <p>
-        Next: Projects → Tasks → Actions tracking.
-      </p>
+        <ProjectsPage />
     </div>
   );
 }

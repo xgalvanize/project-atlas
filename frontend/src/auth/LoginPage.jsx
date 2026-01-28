@@ -1,15 +1,17 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useMutation } from "@apollo/client/react";
 import { gql } from "@apollo/client";
+import { saveToken } from "../auth";
 
-// -------------------
-// GraphQL Login Mutation
-// -------------------
+
+/* -----------------------------
+   GraphQL Login Mutation
+----------------------------- */
 const LOGIN = gql`
   mutation Login($username: String!, $password: String!) {
     tokenAuth(username: $username, password: $password) {
       token
-      refreshToken
     }
   }
 `;
@@ -18,25 +20,23 @@ export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
+  const navigate = useNavigate();
+
   const [loginUser, { loading, error }] = useMutation(LOGIN);
 
-  async function handleSubmit(e) {
+ async function handleSubmit(e) {
     e.preventDefault();
-
     try {
-      const result = await loginUser({
-        variables: { username, password },
-      });
+      const result = await loginUser({ variables: { username, password } });
 
-      // Save tokens
       localStorage.setItem("token", result.data.tokenAuth.token);
       localStorage.setItem(
         "refreshToken",
         result.data.tokenAuth.refreshToken
       );
 
-      // Redirect to dashboard
-      window.location.href = "/";
+      // Redirect after login
+      navigate("/dashboard"); // <- useNavigate works now
     } catch (err) {
       console.error("Login failed:", err);
     }
@@ -47,6 +47,7 @@ export default function LoginPage() {
       <h1>Login to Atlas</h1>
 
       <form onSubmit={handleSubmit}>
+        {/* Username */}
         <div style={{ marginBottom: "1rem" }}>
           <label>Username</label>
           <input
@@ -56,6 +57,7 @@ export default function LoginPage() {
           />
         </div>
 
+        {/* Password */}
         <div style={{ marginBottom: "1rem" }}>
           <label>Password</label>
           <input
@@ -66,12 +68,14 @@ export default function LoginPage() {
           />
         </div>
 
+        {/* Button */}
         <button type="submit" disabled={loading}>
           {loading ? "Logging in..." : "Login"}
         </button>
 
+        {/* Error */}
         {error && (
-          <p style={{ color: "red" }}>
+          <p style={{ color: "red", marginTop: "1rem" }}>
             Error: {error.message}
           </p>
         )}
