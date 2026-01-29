@@ -7,15 +7,21 @@ User = get_user_model()
 
 class Task(models.Model):
     STATUS_CHOICES = [
-        ("PENDING", "Pending"),
-        ("IN_PROGRESS", "In Progress"),
-        ("DONE", "Done"),
+        ("pending", "Pending"),
+        ("in_progress", "In Progress"),
+        ("done", "Done"),
     ]
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="pending"
+    )
+
 
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="tasks")
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="PENDING")
+    
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="created_tasks")
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -23,7 +29,7 @@ class Task(models.Model):
         return self.title
 
 
-class TaskAction(models.Model):
+class Action(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="actions")
     description = models.TextField()
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)

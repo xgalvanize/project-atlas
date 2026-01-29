@@ -2,7 +2,7 @@
 import graphene
 from graphene_django import DjangoObjectType
 from django.contrib.auth import get_user_model
-from .models import Task, TaskAction
+from .models import Task, Action
 from projects.models import Project
 
 User = get_user_model()
@@ -12,14 +12,19 @@ class UserType(DjangoObjectType):
         model = User
         fields = ("id", "username", "email")
 
-class TaskActionType(DjangoObjectType):
+class ActionType(DjangoObjectType):
     class Meta:
-        model = TaskAction
+        model = Action
         fields = ("id", "description", "created_at", "created_by")
 
 class TaskType(DjangoObjectType):
     createdBy = graphene.Field(UserType)
-    actions = graphene.List(TaskActionType)
+   
+    actions = graphene.List(ActionType)
+
+    def resolve_actions(self, info):
+        return self.actions.all()
+
 
     class Meta:
         model = Task
@@ -28,8 +33,6 @@ class TaskType(DjangoObjectType):
     def resolve_createdBy(self, info):
         return self.created_by
 
-    def resolve_actions(self, info):
-        return self.actions.all()
 
 # Mutations
 
@@ -72,8 +75,8 @@ class CreateTask(graphene.Mutation):
         )
         return CreateTask(task=task)
 
-class CreateTaskAction(graphene.Mutation):
-    action = graphene.Field(TaskActionType)
+class CreateAction(graphene.Mutation):
+    action = graphene.Field(ActionType)
 
     class Arguments:
         task_id = graphene.ID(required=True)
@@ -85,12 +88,12 @@ class CreateTaskAction(graphene.Mutation):
             raise Exception("Authentication required")
 
         task = Task.objects.get(id=task_id)
-        action = TaskAction.objects.create(
+        action = Action.objects.create(
             task=task,
             description=description,
             created_by=user
         )
-        return CreateTaskAction(action=action)
+        return CreateAction(action=action)
 
 # Root schema
 
@@ -105,4 +108,4 @@ class Query(graphene.ObjectType):
 class Mutation(graphene.ObjectType):
     create_task = CreateTask.Field()
     update_task_status = UpdateTaskStatus.Field()
-    create_task_action = CreateTaskAction.Field()
+    create_action = CreateAction.Field()
