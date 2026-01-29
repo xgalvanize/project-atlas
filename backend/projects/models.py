@@ -22,7 +22,7 @@ class Action(models.Model):
     STATUS_CHOICES = [
         ("pending", "Pending"),
         ("in_progress", "In Progress"),
-        ("completed", "Completed"),
+        ("done", "Done"),
     ]
 
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="actions")

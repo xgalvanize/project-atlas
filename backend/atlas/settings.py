@@ -43,7 +43,7 @@ INSTALLED_APPS = [
         # Local apps
     "projects",
     "tasks",
-    "actions",
+    # "actions",
     
 ]
 
