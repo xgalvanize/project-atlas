@@ -41,10 +41,22 @@ const CREATE_TASK = gql`
   }
 `;
 
+const UPDATE_TASK_STATUS = gql`
+  mutation UpdateTaskStatus($taskId: ID!, $status: String!) {
+    updateTaskStatus(taskId: $taskId, status: $status) {
+      task {
+        id
+        status
+      }
+    }
+  }
+`;
+
 export default function Dashboard() {
     const { loading, error, data, refetch } = useQuery(GET_PROJECTS);
     const [createProject] = useMutation(CREATE_PROJECT);
     const [createTask] = useMutation(CREATE_TASK);
+    const [updateTaskStatus] = useMutation(UPDATE_TASK_STATUS);
     const [projectName, setProjectName] = useState("");
 
 
@@ -92,15 +104,34 @@ export default function Dashboard() {
             {/* List Projects */}
             {data.projects.map((p) => (
                 <div key={p.id}>
-                   
+
                     <h2>{p.name}</h2>
 
                     {p.tasks.map((t) => (
-                        <p key={t.id}>
-                            {t.title} — {t.status}
-                        </p>
+                        <div key={t.id} style={{ marginBottom: "0.5rem" }}>
+                            <strong>{t.title}</strong>
+
+                            <select
+                                value={t.status}
+                                onChange={async (e) => {
+                                    await updateTaskStatus({
+                                        variables: {
+                                            taskId: t.id,
+                                            status: e.target.value,
+                                        },
+                                    });
+                                    refetch();
+                                }}
+                            >
+                                <option value="PENDING">Pending</option>
+                                <option value="IN_PROGRESS">In Progress</option>
+                                <option value="DONE">Done</option>
+                            </select>
+
+                        </div>
                     ))}
-                     <button onClick={() => handleCreateTask(p.id)}>
+
+                    <button onClick={() => handleCreateTask(p.id)}>
                         + Add Task
                     </button>
                 </div>
