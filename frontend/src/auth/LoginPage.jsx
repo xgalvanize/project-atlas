@@ -36,10 +36,10 @@ export default function LoginPage() {
             const result = await loginUser({ variables: { username, password } });
 
             localStorage.setItem("token", result.data.tokenAuth.token);
-            localStorage.setItem(
-                "refreshToken",
-                result.data.tokenAuth.refreshToken
-            );
+            // localStorage.setItem(
+            //     "refreshToken",
+            //     result.data.tokenAuth.refreshToken
+            // );
             login(result.data.tokenAuth.token); // update context
             // Redirect after login
             navigate("/dashboard"); // <- useNavigate works now

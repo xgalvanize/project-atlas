@@ -25,32 +25,6 @@ class TaskType(DjangoObjectType):
     def resolve_createdBy(self, info):
         return self.created_by
 
-
-class CreateTask(graphene.Mutation):
-    task = graphene.Field(TaskType)
-
-    class Arguments:
-        project_id = graphene.ID(required=True)
-        title = graphene.String(required=True)
-        description = graphene.String()
-
-    def mutate(self, info, project_id, title, description=""):
-        user = info.context.user
-
-        if user.is_anonymous:
-            raise Exception("Authentication required")
-
-        project = Project.objects.get(id=project_id)
-
-        task = Task.objects.create(
-            project=project,
-            title=title,
-            description=description,
-            created_by=user,
-        )
-
-        return CreateTask(task=task)
-
 class UpdateTaskStatus(graphene.Mutation):
     task = graphene.Field(TaskType)
 
@@ -69,6 +43,38 @@ class UpdateTaskStatus(graphene.Mutation):
         task.save()
 
         return UpdateTaskStatus(task=task)
+
+# -------------------------
+# CreateTask Mutation
+# -------------------------
+
+class CreateTask(graphene.Mutation):
+    task = graphene.Field(TaskType)
+
+    class Arguments:
+        project_id = graphene.ID(required=True)
+        title = graphene.String(required=True)
+        description = graphene.String()
+
+    def mutate(self, info, project_id, title, description=""):
+        user = info.context.user
+        if user.is_anonymous:
+            raise Exception("Authentication required")
+
+        try:
+            project = Project.objects.get(id=project_id)
+        except Project.DoesNotExist:
+            raise Exception("Invalid project_id: Project not found")
+
+
+        task = Task.objects.create(
+            project=project,
+            title=title,
+            description=description,
+            created_by=user,
+        )
+
+        return CreateTask(task=task)
 
 
 class Query(graphene.ObjectType):
