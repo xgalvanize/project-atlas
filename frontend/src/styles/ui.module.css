@@ -1,0 +1,33 @@
+.button {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.55rem 1rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.button:hover {
+  background: var(--primary-hover);
+}
+
+.buttonSecondary {
+  background: white;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.input {
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  width: 100%;
+}
+
+.select {
+  padding: 0.4rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}

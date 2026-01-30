@@ -1,0 +1,22 @@
+@import "./variables.css";
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+}
+
+h1, h2, h3 {
+  margin: 0 0 0.75rem;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2rem 0;
+}
+
+button, input, select {
+  font: inherit;
+}

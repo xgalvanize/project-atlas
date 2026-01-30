@@ -2,6 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./auth/AuthContext";
+import "./styles/globals.css";
+
 import App from "./App";
 
 import { ApolloProvider } from "@apollo/client/react";

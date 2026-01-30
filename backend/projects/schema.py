@@ -12,7 +12,7 @@ class ProjectType(DjangoObjectType):
 
     class Meta:
         model = Project
-        fields = ("id", "name", "description", "created_at")
+        fields = ("id", "name", "owner", "description", "createdAt")
 
     def resolve_tasks(self, info):
         return self.tasks.all()

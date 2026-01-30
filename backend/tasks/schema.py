@@ -13,9 +13,12 @@ class UserType(DjangoObjectType):
         fields = ("id", "username", "email")
 
 class ActionType(DjangoObjectType):
+    createdBy = graphene.Field(UserType)
     class Meta:
         model = Action
-        fields = ("id", "description", "created_at", "created_by")
+        fields = ("id", "description", "createdAt", "createdBy")
+    def resolve_createdBy(self, info):
+        return self.createdBy
 
 class TaskType(DjangoObjectType):
     createdBy = graphene.Field(UserType)
@@ -28,10 +31,10 @@ class TaskType(DjangoObjectType):
 
     class Meta:
         model = Task
-        fields = ("id", "title", "description", "status", "created_at", "created_by", "project")
+        fields = ("id", "title", "description", "status", "createdAt", "createdBy", "project")
 
     def resolve_createdBy(self, info):
-        return self.created_by
+        return self.createdBy
 
 
 # Mutations
@@ -40,15 +43,15 @@ class UpdateTaskStatus(graphene.Mutation):
     task = graphene.Field(TaskType)
 
     class Arguments:
-        task_id = graphene.ID(required=True)
+        taskId = graphene.ID(required=True)
         status = graphene.String(required=True)
 
-    def mutate(self, info, task_id, status):
+    def mutate(self, info, taskId, status):
         user = info.context.user
         if user.is_anonymous:
             raise Exception("Authentication required")
 
-        task = Task.objects.get(id=task_id)
+        task = Task.objects.get(id=taskId)
         task.status = status
         task.save()
         return UpdateTaskStatus(task=task)
@@ -57,21 +60,21 @@ class CreateTask(graphene.Mutation):
     task = graphene.Field(TaskType)
 
     class Arguments:
-        project_id = graphene.ID(required=True)
+        projectId = graphene.ID(required=True)
         title = graphene.String(required=True)
         description = graphene.String()
 
-    def mutate(self, info, project_id, title, description=""):
+    def mutate(self, info, projectId, title, description=""):
         user = info.context.user
         if user.is_anonymous:
             raise Exception("Authentication required")
 
-        project = Project.objects.get(id=project_id)
+        project = Project.objects.get(id=projectId)
         task = Task.objects.create(
             project=project,
             title=title,
             description=description,
-            created_by=user
+            createdBy=user
         )
         return CreateTask(task=task)
 
@@ -79,33 +82,33 @@ class CreateAction(graphene.Mutation):
     action = graphene.Field(ActionType)
 
     class Arguments:
-        task_id = graphene.ID(required=True)
+        taskId = graphene.ID(required=True)
         description = graphene.String(required=True)
 
-    def mutate(self, info, task_id, description):
+    def mutate(self, info, taskId, description):
         user = info.context.user
         if user.is_anonymous:
             raise Exception("Authentication required")
 
-        task = Task.objects.get(id=task_id)
+        task = Task.objects.get(id=taskId)
         action = Action.objects.create(
             task=task,
             description=description,
-            created_by=user
+            createdBy=user
         )
         return CreateAction(action=action)
 
 # Root schema
 
 class Query(graphene.ObjectType):
-    tasks = graphene.List(TaskType, project_id=graphene.ID())
+    tasks = graphene.List(TaskType, projectId=graphene.ID())
 
-    def resolve_tasks(self, info, project_id=None):
-        if project_id:
-            return Task.objects.filter(project_id=project_id)
+    def resolve_tasks(self, info, projectId=None):
+        if projectId:
+            return Task.objects.filter(projectId=projectId)
         return Task.objects.all()
 
 class Mutation(graphene.ObjectType):
-    create_task = CreateTask.Field()
-    update_task_status = UpdateTaskStatus.Field()
-    create_action = CreateAction.Field()
+    createTask = CreateTask.Field()
+    updateTaskStatus = UpdateTaskStatus.Field()
+    createAction = CreateAction.Field()

@@ -2,9 +2,9 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/client/react";
 import { gql } from "@apollo/client";
-import Layout from "./layout/Layout";
+import Layout from "./components/Layout/Layout";
 import RequireAuth from "./auth/RequireAuth";
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "./components/Pages/Dashboard/Dashboard";
 import LoginPage from "./auth/LoginPage";
 // -----------------------------
 // GraphQL Query

@@ -6,7 +6,7 @@ User = get_user_model()
 class Project(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    createdAt = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="projects")
 
     def __str__(self):
