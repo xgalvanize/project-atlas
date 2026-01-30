@@ -6,7 +6,7 @@ export default function Layout({ children }) {
     <div>
       <Navbar />
 
-      <main style={{ padding: "2rem" }}>
+      <main style={{ padding: "1rem" }}>
         {children}
       </main>
     </div>

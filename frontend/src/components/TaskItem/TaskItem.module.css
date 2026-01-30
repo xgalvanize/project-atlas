@@ -1,0 +1,50 @@
+.taskItem {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.title {
+  font-weight: 600;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.actions {
+  margin-top: 0.75rem;
+  padding-left: 1.25rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .row {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .controls {
+    flex-direction: row;
+  }
+
+  .controls button {
+    width: auto;
+  }
+
+  .controls select {
+    width: auto;
+  }
+}

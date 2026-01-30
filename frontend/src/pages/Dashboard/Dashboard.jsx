@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import ProjectsPage from "../ProjectsPage";
 import { gql } from "@apollo/client";
 import { useQuery, useMutation } from "@apollo/client/react";
-import CreateTaskForm from "../../CreateTaskForm";
+import CreateTaskForm from "../../components/CreateTaskForm";
+import ProjectCard from "../../components/ProjectCard/ProjectCard";
+import InlineForm from "../../components/InlineForm/InlineForm";
 import styles from "./Dashboard.module.css";
-import ui from "../../../styles/ui.module.css";
+import ui from "../../styles/ui.module.css";
 const GET_PROJECTS = gql`
   query {
     projects {
@@ -122,80 +124,48 @@ export default function Dashboard() {
   }
 
   return (
-    <div className={styles.wrapper}>
-      <h1>Your Projects</h1>
-
-      {/* Create Project */}
-      <form onSubmit={handleCreateProject} className={styles.formRow}>
-        <input
-          className={ui.input}
-          value={projectName}
-          onChange={(e) => setProjectName(e.target.value)}
-          placeholder="New project name"
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h1>Your Projects</h1>
+        <InlineForm
+          placeholder="New project name..."
+          buttonText="Create Project"
+          onSubmit={async (name) => {
+            await createProject({ variables: { name } });
+            refetch();
+          }}
         />
-        <button className={ui.button} type="submit">
-          Create
-        </button>
-      </form>
+        {/* <form onSubmit={handleCreateProject}>
+          <input
+            className={ui.input}
+            value={projectName}
+            onChange={(e) => setProjectName(e.target.value)}
+            placeholder="New project name"
+          />
 
-      {/* Projects */}
-      {data.projects.map((p) => (
-        <div key={p.id} className={styles.projectCard}>
-          <h2>{p.name}</h2>
-
-          {/* Tasks */}
-          {p.tasks.map((t) => (
-            <div key={t.id}>
-              <div className={styles.taskRow}>
-                <span className={styles.taskTitle}>{t.title}</span>
-
-                <select
-                  className={ui.select}
-                  value={t.status}
-                  onChange={async (e) => {
-                    await updateTaskStatus({
-                      variables: {
-                        taskId: t.id,
-                        status: e.target.value,
-                      },
-                    });
-                    refetch();
-                  }}
-                >
-                  <option value="PENDING">Pending</option>
-                  <option value="IN_PROGRESS">In Progress</option>
-                  <option value="DONE">Done</option>
-                </select>
-
-                <button
-                  className={`${ui.button} ${ui.buttonSecondary}`}
-                  onClick={() => handleCreateAction(t.id)}
-                >
-                  + Action
-                </button>
-              </div>
-
-              {/* Actions */}
-              {t.actions.length > 0 && (
-                <ul className={styles.actionsList}>
-                  {t.actions.map((a) => (
-                    <li key={a.id}>
-                      {a.description} —{" "}
-                      {a.createdBy?.username || "Unknown"}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          ))}
-
-          <button
-            className={ui.button}
-            onClick={() => handleCreateTask(p.id)}
-          >
-            + Add Task
+          <button className={`${ui.button} ${ui.buttonPrimary}`}>
+            Create Project
           </button>
-        </div>
+        </form> */}
+      </div>
+
+      {data.projects.map((p) => (
+        <ProjectCard
+          key={p.id}
+          project={p}
+          onAddTask={async (projectId, title) => {
+            await createTask({ variables: { projectId, title } });
+            refetch();
+          }}
+          onAddAction={async (taskId, description) => {
+            await createAction({ variables: { taskId, description } });
+            refetch();
+          }}
+          onStatusChange={async (taskId, status) => {
+            await updateTaskStatus({ variables: { taskId, status } });
+            refetch();
+          }}
+        />
       ))}
     </div>
   );

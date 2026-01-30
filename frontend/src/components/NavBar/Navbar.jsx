@@ -33,7 +33,7 @@ export default function Navbar() {
       <div>
         {isLoggedIn ? (
           <>
-            <Link
+            {/* <Link
               to="/dashboard"
               style={{
                 marginRight: "1rem",
@@ -43,7 +43,7 @@ export default function Navbar() {
               }}
             >
               Dashboard
-            </Link>
+            </Link> */}
             <button
               onClick={handleLogout}
               style={{

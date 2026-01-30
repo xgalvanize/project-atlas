@@ -4,7 +4,7 @@ import { useQuery, useMutation } from "@apollo/client/react";
 import { gql } from "@apollo/client";
 import Layout from "./components/Layout/Layout";
 import RequireAuth from "./auth/RequireAuth";
-import Dashboard from "./components/Pages/Dashboard/Dashboard";
+import Dashboard from "./pages/Dashboard/Dashboard";
 import LoginPage from "./auth/LoginPage";
 // -----------------------------
 // GraphQL Query

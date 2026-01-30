@@ -1,0 +1,60 @@
+.container {
+  padding: var(--space-md);
+  max-width: 100%;
+  margin: auto;
+}
+
+.header {
+  margin-bottom: var(--space-lg);
+}
+
+.projectCard {
+  margin-bottom: var(--space-lg);
+}
+
+.taskItem {
+  margin-top: var(--space-md);
+  padding: var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #fdfdfd;
+}
+
+.taskRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.taskTitle {
+  font-weight: 600;
+}
+
+.actionsList {
+  margin-top: var(--space-sm);
+  padding-left: 1rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* Desktop upgrade */
+@media (min-width: 768px) {
+  .taskRow {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .taskControls {
+    display: flex;
+    gap: var(--space-sm);
+  }
+
+  .buttonSmall {
+    width: auto;
+  }
+
+  .selectSmall {
+    width: auto;
+  }
+}
