@@ -10,6 +10,7 @@ Django==6.0.1
 django-cors-headers==4.9.0
 django-graphql-jwt==0.4.0
 djangorestframework==3.16.1
+gunicorn==23.0.0
 dnspython==2.8.0
 graphene==3.4.3
 graphene-django==3.2.3
