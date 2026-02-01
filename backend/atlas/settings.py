@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'graphene_django',
-    "graphql_jwt.refresh_token",
+    # "graphql_jwt.refresh_token",
     "corsheaders",
         # Local apps
     "projects",
@@ -185,3 +185,7 @@ GRAPHQL_JWT = {
     # Refresh token lasts 30 days
     "JWT_REFRESH_EXPIRATION_DELTA": timedelta(days=30),
 }
+
+INSTALLED_APPS += [
+    "graphql_jwt.refresh_token.apps.RefreshTokenConfig",
+]

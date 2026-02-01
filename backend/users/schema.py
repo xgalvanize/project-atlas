@@ -5,7 +5,6 @@ import graphql_jwt
 
 User = get_user_model()
 
-
 # -----------------------------
 # User Type
 # -----------------------------
@@ -13,7 +12,6 @@ class UserType(DjangoObjectType):
     class Meta:
         model = User
         fields = ("id", "username", "email")
-
 
 # -----------------------------
 # Register Mutation
@@ -38,18 +36,15 @@ class RegisterUser(graphene.Mutation):
 
         return RegisterUser(user=user)
 
-
 # -----------------------------
 # Mutation Root
 # -----------------------------
 class Mutation(graphene.ObjectType):
     register_user = RegisterUser.Field()
-
     token_auth = graphql_jwt.ObtainJSONWebToken.Field()
     verify_token = graphql_jwt.Verify.Field()
     refresh_token = graphql_jwt.Refresh.Field()
     revoke_token = graphql_jwt.Revoke.Field()
-
 
 class Query(graphene.ObjectType):
     me = graphene.Field(UserType)

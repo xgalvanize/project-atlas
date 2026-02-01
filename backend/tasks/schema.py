@@ -16,12 +16,13 @@ class ActionType(DjangoObjectType):
     createdBy = graphene.Field(UserType)
     class Meta:
         model = Action
-        fields = ("id", "description", "createdAt", "createdBy")
-    def resolve_createdBy(self, info):
-        return self.createdBy
+        fields = ("id", "description", "created_at", "created_by")
+
+    def resolve_created_by(self, info):
+        return self.created_by
 
 class TaskType(DjangoObjectType):
-    createdBy = graphene.Field(UserType)
+    created_by = graphene.Field(UserType)
    
     actions = graphene.List(ActionType)
 
@@ -31,11 +32,10 @@ class TaskType(DjangoObjectType):
 
     class Meta:
         model = Task
-        fields = ("id", "title", "description", "status", "createdAt", "createdBy", "project")
+        fields = ("id", "title", "description", "status", "created_at", "created_by", "project")
 
-    def resolve_createdBy(self, info):
-        return self.createdBy
-
+    def resolve_created_by(self, info):
+        return self.created_by
 
 # Mutations
 
@@ -43,15 +43,15 @@ class UpdateTaskStatus(graphene.Mutation):
     task = graphene.Field(TaskType)
 
     class Arguments:
-        taskId = graphene.ID(required=True)
+        task_id = graphene.ID(required=True)
         status = graphene.String(required=True)
 
-    def mutate(self, info, taskId, status):
+    def mutate(self, info, task_id, status):
         user = info.context.user
         if user.is_anonymous:
             raise Exception("Authentication required")
 
-        task = Task.objects.get(id=taskId)
+        task = Task.objects.get(id=task_id)
         task.status = status
         task.save()
         return UpdateTaskStatus(task=task)
@@ -60,21 +60,21 @@ class CreateTask(graphene.Mutation):
     task = graphene.Field(TaskType)
 
     class Arguments:
-        projectId = graphene.ID(required=True)
+        project_id = graphene.ID(required=True)
         title = graphene.String(required=True)
         description = graphene.String()
 
-    def mutate(self, info, projectId, title, description=""):
+    def mutate(self, info, project_id, title, description=""):
         user = info.context.user
         if user.is_anonymous:
             raise Exception("Authentication required")
 
-        project = Project.objects.get(id=projectId)
+        project = Project.objects.get(id=project_id)
         task = Task.objects.create(
             project=project,
             title=title,
             description=description,
-            createdBy=user
+            created_by=user
         )
         return CreateTask(task=task)
 
@@ -82,33 +82,33 @@ class CreateAction(graphene.Mutation):
     action = graphene.Field(ActionType)
 
     class Arguments:
-        taskId = graphene.ID(required=True)
+        task_id = graphene.ID(required=True)
         description = graphene.String(required=True)
 
-    def mutate(self, info, taskId, description):
+    def mutate(self, info, task_id, description):
         user = info.context.user
         if user.is_anonymous:
             raise Exception("Authentication required")
 
-        task = Task.objects.get(id=taskId)
+        task = Task.objects.get(id=task_id)
         action = Action.objects.create(
             task=task,
             description=description,
-            createdBy=user
+            created_by=user
         )
         return CreateAction(action=action)
 
 # Root schema
 
 class Query(graphene.ObjectType):
-    tasks = graphene.List(TaskType, projectId=graphene.ID())
+    tasks = graphene.List(TaskType, project_id=graphene.ID())
 
-    def resolve_tasks(self, info, projectId=None):
-        if projectId:
-            return Task.objects.filter(projectId=projectId)
+    def resolve_tasks(self, info, project_id=None):
+        if project_id:
+            return Task.objects.filter(project_id=project_id)
         return Task.objects.all()
 
 class Mutation(graphene.ObjectType):
-    createTask = CreateTask.Field()
-    updateTaskStatus = UpdateTaskStatus.Field()
-    createAction = CreateAction.Field()
+    create_task = CreateTask.Field()
+    update_task_status = UpdateTaskStatus.Field()
+    create_action = CreateAction.Field()
