@@ -7,8 +7,7 @@ const httpLink = new HttpLink({
 });
 
 const authLink = setContext((_, { headers }) => {
-  const token = getToken();
-
+  const token = localStorage.getItem("token");
   return {
     headers: {
       ...headers,
@@ -17,19 +16,24 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
-/* Auto logout if token expired */
-const errorLink = onError(({ graphQLErrors }) => {
-  if (graphQLErrors) {
-    graphQLErrors.forEach((err) => {
-      if (err.message.includes("Signature has expired")) {
-        alert("Session expired. Please log in again.");
-        logout();
-      }
-    });
-  }
-});
-
 export const client = new ApolloClient({
-  link: errorLink.concat(authLink.concat(httpLink)),
+  link: authLink.concat(httpLink),
   cache: new InMemoryCache(),
 });
+
+/* Auto logout if token expired */
+// const errorLink = onError(({ graphQLErrors }) => {
+//   if (graphQLErrors) {
+//     graphQLErrors.forEach((err) => {
+//       if (err.message.includes("Signature has expired")) {
+//         alert("Session expired. Please log in again.");
+//         logout();
+//       }
+//     });
+//   }
+// });
+
+// export const client = new ApolloClient({
+//   link: errorLink.concat(authLink.concat(httpLink)),
+//   cache: new InMemoryCache(),
+// });

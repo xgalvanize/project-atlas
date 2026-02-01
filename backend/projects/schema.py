@@ -26,6 +26,9 @@ class CreateProject(graphene.Mutation):
 
     @login_required
     def mutate(self, info, name, description=""):
+        print("USER:", info.context.user)
+        print("AUTH:", info.context.user.is_authenticated)
+
         project = Project.objects.create(
             name=name,
             description=description,
