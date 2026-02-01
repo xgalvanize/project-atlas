@@ -1,9 +1,9 @@
 import graphene
 from graphene_django import DjangoObjectType
-from .models import Project
-from tasks.schema import TaskType
 from graphql_jwt.decorators import login_required
 
+from .models import Project
+from tasks.schema import TaskType
 
 
 class ProjectType(DjangoObjectType):
@@ -16,6 +16,7 @@ class ProjectType(DjangoObjectType):
     def resolve_tasks(self, info):
         return self.tasks.all()
 
+
 class CreateProject(graphene.Mutation):
     project = graphene.Field(ProjectType)
 
@@ -25,14 +26,11 @@ class CreateProject(graphene.Mutation):
 
     @login_required
     def mutate(self, info, name, description=""):
-        user = info.context.user
-
         project = Project.objects.create(
             name=name,
             description=description,
-            owner=user,
+            owner=info.context.user,
         )
-
         return CreateProject(project=project)
 
 
@@ -40,7 +38,7 @@ class Query(graphene.ObjectType):
     projects = graphene.List(ProjectType)
 
     @login_required
-    def resolve_projects(root, info):
+    def resolve_projects(self, info):
         return Project.objects.filter(owner=info.context.user)
 
 
