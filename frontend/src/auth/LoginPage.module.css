@@ -1,0 +1,31 @@
+.container {
+  max-width: 420px;
+  margin: 3rem auto;
+}
+
+
+.title {
+  margin: 0 0 1rem 0;
+  font-size: 1.25rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.error {
+  color: var(--danger);
+  margin-top: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  /* card padding handled by ui.module.css */
+}

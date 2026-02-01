@@ -12,7 +12,7 @@ export default function TaskItem({
     const [showActionForm, setShowActionForm] = useState(false);
 
     return (
-        <div className={styles.taskItem}>
+        <div className={`${ui.card} ${styles.taskItem}`}>
             <div className={styles.row}>
                 <div className={styles.title}>{task.title} - {task.createdBy?.username}</div>
 

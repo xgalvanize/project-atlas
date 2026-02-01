@@ -1,8 +1,5 @@
 .taskItem {
   margin-top: 1rem;
-  padding: 1rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
 }
 
 .row {
