@@ -14,7 +14,7 @@ export default function TaskItem({
     return (
         <div className={styles.taskItem}>
             <div className={styles.row}>
-                <div className={styles.title}>{task.title}</div>
+                <div className={styles.title}>{task.title} - {task.createdBy?.username}</div>
 
                 <div className={styles.controls}>
                     <select
@@ -56,11 +56,14 @@ export default function TaskItem({
             {/* Actions List */}
             {task.actions.length > 0 && (
                 <ul className={styles.actions}>
-                    {task.actions.map((a) => (
-                        <li key={a.id}>
-                            {a.description} — {a.createdBy?.username}
-                        </li>
-                    ))}
+                    {task.actions.map((a) => {
+                        console.log("ACTION:", a);
+                        return (
+                            <li key={a.id}>
+                                {a.description} - {a.createdBy?.username}
+                            </li>
+                        )
+                    })}
                 </ul>
             )}
         </div>

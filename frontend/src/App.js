@@ -1,68 +1,19 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
-import { useQuery, useMutation } from "@apollo/client/react";
-import { gql } from "@apollo/client";
+import { Routes, Route, Navigate } from "react-router-dom";
+
 import Layout from "./components/Layout/Layout";
 import RequireAuth from "./auth/RequireAuth";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import LoginPage from "./auth/LoginPage";
-// -----------------------------
-// GraphQL Query
-// -----------------------------
-
-const GET_PROJECTS = gql`
-  query {
-    projects {
-      id
-      name
-      tasks {
-        id
-        title
-        status
-      }
-    }
-  }
-`;
-
-// -----------------------------
-// GraphQL Mutation
-// -----------------------------
-
-const UPDATE_TASK_STATUS = gql`
-  mutation UpdateTaskStatus($taskId: ID!, $status: String!) {
-    updateTaskStatus(taskId: $taskId, status: $status) {
-      task {
-        id
-        status
-      }
-    }
-  }
-`;
-
-const LOGIN = gql`
-  mutation Login($username: String!, $password: String!) {
-    tokenAuth(username: $username, password: $password) {
-      token
-    }
-  }
-`;
-
-// -----------------------------
-// React Component
-// -----------------------------
 
 export default function App() {
-  const { loading, error, data, refetch } = useQuery(GET_PROJECTS);
-
-  const [updateTaskStatus] = useMutation(UPDATE_TASK_STATUS);
-
-  if (loading) return <p>Loading projects…</p>;
-  if (error) return <p>Error: {error.message}</p>;
-
   return (
     <Layout>
       <Routes>
+        {/* Public */}
         <Route path="/login" element={<LoginPage />} />
+
+        {/* Protected */}
         <Route
           path="/dashboard"
           element={
@@ -71,11 +22,14 @@ export default function App() {
             </RequireAuth>
           }
         />
-        <Route path="*" element={<LoginPage />} />
+
+        {/* Default */}
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Layout>
   );
 }
+
 //     <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
 //       <h1>Project Atlas</h1>
 

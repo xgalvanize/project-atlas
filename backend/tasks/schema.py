@@ -18,24 +18,23 @@ class ActionType(DjangoObjectType):
         model = Action
         fields = ("id", "description", "created_at", "created_by")
 
-    def resolve_created_by(self, info):
+    def resolve_createdBy(self, info):
         return self.created_by
 
 class TaskType(DjangoObjectType):
-    created_by = graphene.Field(UserType)
-   
+    createdBy = graphene.Field(UserType)
+
     actions = graphene.List(ActionType)
 
     def resolve_actions(self, info):
         return self.actions.all()
 
+    def resolve_createdBy(self, info):
+        return self.created_by
 
     class Meta:
         model = Task
         fields = ("id", "title", "description", "status", "created_at", "created_by", "project")
-
-    def resolve_created_by(self, info):
-        return self.created_by
 
 # Mutations
 

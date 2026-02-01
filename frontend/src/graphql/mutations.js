@@ -21,6 +21,9 @@ export const CREATE_TASK = gql`
         id
         title
         status
+        createdBy {
+          username
+        }
         actions {
           id
         }

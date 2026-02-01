@@ -9,6 +9,9 @@ export const GET_PROJECTS = gql`
         id
         title
         status
+        createdBy {
+          username
+        }
         actions {
           id
           description

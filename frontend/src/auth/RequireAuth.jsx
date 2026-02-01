@@ -1,11 +1,12 @@
 import React from "react";
-import LoginPage from "./LoginPage";
+import { Navigate } from "react-router-dom";
+import { useAuth } from "./AuthContext";
 
 export default function RequireAuth({ children }) {
-  const token = localStorage.getItem("token");
+  const { isLoggedIn } = useAuth();
 
-  if (!token) {
-    return <LoginPage />;
+  if (!isLoggedIn) {
+    return <Navigate to="/login" replace />;
   }
 
   return children;
