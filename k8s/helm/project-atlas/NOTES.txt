@@ -1,0 +1,12 @@
+Thank you for installing Project Atlas.
+
+To deploy using the images defined in `values.yaml`, run:
+
+  helm install project-atlas ./project-atlas -n {{ .Values.namespace }} --create-namespace
+
+To override image repository/tag, for example:
+
+  helm upgrade --install project-atlas ./project-atlas \
+    -n {{ .Values.namespace }} --create-namespace \
+    --set backend.image.repository=docker.io/xgalvanize/project-atlas-backend \
+    --set backend.image.tag=sha

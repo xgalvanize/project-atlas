@@ -1,0 +1,33 @@
+namespace: project-atlas
+
+backend:
+  replicaCount: 2
+  image:
+    repository: docker.io/xgalvanize/project-atlas-backend
+    tag: latest
+  service:
+    port: 8000
+  # Do NOT put real secrets here in the repo. Pass them at install time
+  # e.g. --set-string backend.secrets.DJANGO_SECRET_KEY="..."
+  secrets: {}
+
+frontend:
+  replicaCount: 2
+  image:
+    repository: docker.io/xgalvanize/project-atlas-frontend
+    tag: latest
+  service:
+    port: 80
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: atlas.local
+      paths:
+        - path: /
+          pathType: Prefix
+    - host: api.atlas.local
+      paths:
+        - path: /api
+          pathType: Prefix
