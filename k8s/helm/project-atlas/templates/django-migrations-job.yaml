@@ -1,29 +1,24 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
-  name: backend
+  name: django-migrations
   namespace: {{ .Values.namespace }}
   labels:
-    app: backend
+    app: backend-migrations
 spec:
-  replicas: {{ .Values.backend.replicaCount }}
-  selector:
-    matchLabels:
-      app: backend
   template:
-    metadata:
-      labels:
-        app: backend
     spec:
+      restartPolicy: Never
+      initContainers:
+        - name: wait-for-postgres
+          image: busybox:1.36
+          command: ['sh', '-c', 'until nc -z postgres 5432; do echo waiting for postgres; sleep 2; done;']
       containers:
-        - name: backend
+        - name: migrate
           image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
           imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: {{ .Values.backend.service.port }}
+          command: ["python", "manage.py", "migrate"]
           env:
-            - name: PYTHONUNBUFFERED
-              value: "1"
             - name: DB_HOST
               value: {{ .Values.backend.db.host }}
             - name: DB_PORT
@@ -37,3 +32,4 @@ spec:
                 secretKeyRef:
                   name: postgres-secret
                   key: password
+  backoffLimit: 3

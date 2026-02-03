@@ -1,15 +1,29 @@
 namespace: project-atlas
 
+postgres:
+  image:
+    repository: postgres
+    tag: "15-alpine"
+  database: atlas_db
+  user: atlas_user
+  password: strongpassword  # Change in production via --set-string
+  storage: 2Gi
+
 backend:
   replicaCount: 2
   image:
     repository: docker.io/xgalvanize/project-atlas-backend
-    tag: latest
+    tag: dev-20260202
   service:
     port: 8000
   # Do NOT put real secrets here in the repo. Pass them at install time
   # e.g. --set-string backend.secrets.DJANGO_SECRET_KEY="..."
   secrets: {}
+  db:
+    host: postgres
+    port: "5432"
+    name: atlas_db
+    user: atlas_user
 
 frontend:
   replicaCount: 2
