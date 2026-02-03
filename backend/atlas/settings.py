@@ -26,7 +26,14 @@ SECRET_KEY = 'django-insecure-niq*4iar7o)@o=s9+)fur*brgqukkkjz7j+#%dik7k-t=pni=i
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '10.0.0.145', '99.227.9.76']
+import os
+
+# Allow configuring allowed hosts via env `ALLOWED_HOSTS` (comma-separated).
+# Include common local dev hosts plus the ingress hosts used by the cluster.
+ALLOWED_HOSTS = os.environ.get(
+    'ALLOWED_HOSTS',
+    'localhost,127.0.0.1,10.0.0.145,99.227.9.76,api.atlas.local,atlas.local'
+).split(',')
 
 # Application definition
 
@@ -89,7 +96,7 @@ DATABASES = {
         "NAME": os.environ.get("DB_NAME", "atlas_db"),
         "USER": os.environ.get("DB_USER", "atlas_user"),
         "PASSWORD": os.environ.get("DB_PASSWORD", "strongpassword"),
-        "HOST": os.environ.get("DB_HOST", "127.0.0.1"),
+        "HOST": os.environ.get("DB_HOST", "postgres"),
         "PORT": os.environ.get("DB_PORT", "5432"),
     }
 }
