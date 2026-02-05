@@ -16,24 +16,54 @@ spec:
         app: backend
     spec:
       containers:
-        - name: backend
-          image: docker.io/xgalvanize/project-atlas-backend:latest
-          imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 8000
-          env:
-            - name: PYTHONUNBUFFERED
-              value: "1"
-            - name: DB_HOST
-              value: postgres
-            - name: DB_PORT
-              value: "5432"
-            - name: DB_NAME
-              value: "atlas_db"
-            - name: DB_USER
-              value: "atlas_user"
-            - name: DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: postgres-secret
-                  key: password
+      - name: backend
+        image: docker.io/xgalvanize/project-atlas-backend:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 8000
+        env:
+          - name: PYTHONUNBUFFERED
+            value: "1"
+          - name: DB_HOST
+            value: "postgres"
+          - name: DB_PORT
+            value: "5432"
+          - name: DB_NAME
+            value: "atlas_db"
+          - name: DB_USER
+            value: "atlas_user"
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres-secret
+                key: password
+          - name: ADMIN_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: django-admin-secret
+                key: username
+          - name: ADMIN_EMAIL
+            valueFrom:
+              secretKeyRef:
+                name: django-admin-secret
+                key: email
+          - name: ADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: django-admin-secret
+                key: password
+          - name: DJANGO_SUPERUSER_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: django-admin-secret
+                key: username
+          - name: DJANGO_SUPERUSER_EMAIL
+            valueFrom:
+              secretKeyRef:
+                name: django-admin-secret
+                key: email
+          - name: DJANGO_SUPERUSER_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: django-admin-secret
+                key: password
