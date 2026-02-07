@@ -56,6 +56,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
@@ -137,6 +138,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 CELERY_BROKER_URL = "redis://localhost:6379/0"
 CELERY_ACCEPT_CONTENT = ["json"]
@@ -144,7 +146,9 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "http://localhost:8080",
     "http://127.0.0.1:3000",
+    "http://127.0.0.1:8080",
     "http://10.0.0.145:3000",
     "http://99.227.9.76:3000",   # Optional but helpful
 ]
@@ -182,3 +186,6 @@ GRAPHQL_JWT = {
 INSTALLED_APPS += [
     "graphql_jwt.refresh_token.apps.RefreshTokenConfig",
 ]
+
+# WhiteNoise configuration for serving static files
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

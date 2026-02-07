@@ -6,7 +6,7 @@ metadata:
   labels:
     app: backend
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: backend
@@ -19,6 +19,12 @@ spec:
       - name: backend
         image: docker.io/xgalvanize/project-atlas-backend:latest
         imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
         ports:
           - containerPort: 8000
         env:
@@ -67,3 +73,9 @@ spec:
               secretKeyRef:
                 name: django-admin-secret
                 key: password
+          - name: ALLOWED_HOSTS
+            value: "localhost,127.0.0.1,backend.project-atlas.svc.cluster.local,api.atlas.local,atlas.local"
+      tolerations:
+        - key: "node.kubernetes.io/disk-pressure"
+          operator: "Exists"
+          effect: "NoSchedule"
