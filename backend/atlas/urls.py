@@ -29,11 +29,4 @@ urlpatterns = [
             GraphQLView.as_view(schema=schema, graphiql=True)
         ),
     ),
-    # path(
-    #     "graphql/",
-    #     GraphQLView.as_view(
-    #         schema=schema,
-    #         graphiql=True,  # keep this ON in dev
-    #     ),
-    # ),
 ]
