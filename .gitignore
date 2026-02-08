@@ -45,6 +45,7 @@ docker-volumes/
 ############################
 *.kubeconfig
 .kube/
+k8s/plain/*-secret.yaml
 
 ############################
 # Node / Frontend
