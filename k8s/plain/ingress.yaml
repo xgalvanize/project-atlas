@@ -11,6 +11,13 @@ spec:
     - host: atlas.local
       http:
         paths:
+          - path: /graphql
+            pathType: Prefix
+            backend:
+              service:
+                name: backend
+                port:
+                  number: 8000
           - path: /
             pathType: Prefix
             backend:
@@ -21,7 +28,14 @@ spec:
     - host: api.atlas.local
       http:
         paths:
-          - path: /api
+          - path: /graphql
+            pathType: Prefix
+            backend:
+              service:
+                name: backend
+                port:
+                  number: 8000
+          - path: /static
             pathType: Prefix
             backend:
               service:

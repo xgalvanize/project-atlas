@@ -3,7 +3,7 @@ import { setContext } from "@apollo/client/link/context";
 import { getToken, logout } from "./auth";
 import { onError } from "@apollo/client/link/error";
 const httpLink = new HttpLink({
-  uri: "http://localhost:8000/graphql/",
+  uri: "/graphql/",
 });
 
 const authLink = setContext((_, { headers }) => {
