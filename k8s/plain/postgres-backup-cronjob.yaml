@@ -1,0 +1,57 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgres-backup
+  namespace: project-atlas
+spec:
+  schedule: "0 3 * * *" # daily at 03:00
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: backup
+              image: postgres:15-alpine
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: DB_HOST
+                  value: "postgres"
+                - name: DB_PORT
+                  value: "5432"
+                - name: DB_NAME
+                  value: "atlas_db"
+                - name: DB_USER
+                  value: "atlas_user"
+                - name: DB_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-secret
+                      key: password
+                - name: BACKUP_MIN_FREE_MB
+                  value: "512"
+              volumeMounts:
+                - name: backup
+                  mountPath: /backups
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  set -euo pipefail
+                  apk add --no-cache bash coreutils gzip
+                  free_kb=$(df -Pk /backups | awk 'NR==2 {print $4}')
+                  free_mb=$((free_kb / 1024))
+                  if [ "$free_mb" -lt "$BACKUP_MIN_FREE_MB" ]; then
+                    echo "Not enough space in /backups: ${free_mb}MB free, need ${BACKUP_MIN_FREE_MB}MB" >&2
+                    exit 1
+                  fi
+                  ts=$(date +%Y%m%d_%H%M%S)
+                  dumpfile=/backups/${DB_NAME}_${ts}.sql.gz
+                  PGPASSWORD="$DB_PASSWORD" pg_dump -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" "$DB_NAME" | gzip > "$dumpfile"
+                  ls -1t /backups/${DB_NAME}_*.sql.gz | tail -n +8 | xargs -r rm -f
+          volumes:
+            - name: backup
+              persistentVolumeClaim:
+                claimName: postgres-backup-pvc
