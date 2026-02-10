@@ -5,8 +5,9 @@ metadata:
   name: project-atlas-ingress
   namespace: {{ .Values.namespace }}
   annotations:
-    kubernetes.io/ingress.class: "{{ .Values.ingress.className }}"
+{{- toYaml .Values.ingress.annotations | nindent 4 }}
 spec:
+  ingressClassName: {{ .Values.ingress.className }}
   rules:
 {{- range .Values.ingress.hosts }}
     - host: {{ .host }}
@@ -17,9 +18,9 @@ spec:
             pathType: {{ .pathType }}
             backend:
               service:
-                name: {{ if eq .path "/" }}frontend{{ else }}backend{{ end }}
+                name: {{ .serviceName }}
                 port:
-                  number: {{ if eq .path "/" }}{{ $.Values.frontend.service.port }}{{ else }}{{ $.Values.backend.service.port }}{{ end }}
+                  number: {{ .servicePort }}
 {{- end }}
 {{- end }}
 {{- end }}

@@ -1,13 +1,14 @@
+{{- if .Values.backup.enabled }}
 apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: postgres-backup
-  namespace: project-atlas
+  namespace: {{ .Values.namespace }}
 spec:
-  schedule: "0 3 * * *" # daily at 03:00
+  schedule: {{ .Values.backup.schedule | quote }}
   concurrencyPolicy: Forbid
-  successfulJobsHistoryLimit: 3
-  failedJobsHistoryLimit: 3
+  successfulJobsHistoryLimit: {{ .Values.backup.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.backup.failedJobsHistoryLimit }}
   jobTemplate:
     spec:
       template:
@@ -15,24 +16,24 @@ spec:
           restartPolicy: Never
           containers:
             - name: backup
-              image: postgres:15-alpine
-              imagePullPolicy: IfNotPresent
+              image: "{{ .Values.backup.image.repository }}:{{ .Values.backup.image.tag }}"
+              imagePullPolicy: {{ .Values.backup.image.pullPolicy }}
               env:
                 - name: DB_HOST
-                  value: "postgres"
+                  value: {{ .Values.backend.db.host | quote }}
                 - name: DB_PORT
-                  value: "5432"
+                  value: {{ .Values.backend.db.port | quote }}
                 - name: DB_NAME
-                  value: "atlas_db"
+                  value: {{ .Values.backend.db.name | quote }}
                 - name: DB_USER
-                  value: "atlas_user"
+                  value: {{ .Values.backend.db.user | quote }}
                 - name: DB_PASSWORD
                   valueFrom:
                     secretKeyRef:
                       name: postgres-secret
                       key: password
                 - name: BACKUP_MIN_FREE_MB
-                  value: "512"
+                  value: {{ .Values.backup.minFreeMb | quote }}
               volumeMounts:
                 - name: backup
                   mountPath: /backups
@@ -50,8 +51,9 @@ spec:
                   ts=$(date +%Y%m%d_%H%M%S)
                   dumpfile=/backups/${DB_NAME}_${ts}.sql.gz
                   PGPASSWORD="$DB_PASSWORD" pg_dump -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" "$DB_NAME" | gzip > "$dumpfile"
-                  ls -1t /backups/${DB_NAME}_*.sql.gz | tail -n +11 | xargs -r rm -f
+                  ls -1t /backups/${DB_NAME}_*.sql.gz | tail -n +$(({{ .Values.backup.keepLast }} + 1)) | xargs -r rm -f
           volumes:
             - name: backup
               persistentVolumeClaim:
                 claimName: postgres-backup-pvc
+{{- end }}

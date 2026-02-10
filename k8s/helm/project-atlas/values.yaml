@@ -1,47 +1,107 @@
 namespace: project-atlas
+namespaceCreate: false
 
 postgres:
   image:
     repository: postgres
     tag: "15-alpine"
+    pullPolicy: IfNotPresent
   database: atlas_db
   user: atlas_user
-  password: strongpassword  # Change in production via --set-string
+  password: strongpassword # Change via --set-string
   storage: 2Gi
 
 backend:
-  replicaCount: 2
+  replicaCount: 1
   image:
     repository: docker.io/xgalvanize/project-atlas-backend
-    tag: dev-20260202
+    tag: latest
+    pullPolicy: IfNotPresent
   service:
     port: 8000
-  # Do NOT put real secrets here in the repo. Pass them at install time
-  # e.g. --set-string backend.secrets.DJANGO_SECRET_KEY="..."
-  secrets: {}
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+  allowedHosts: "localhost,127.0.0.1,backend.project-atlas.svc.cluster.local,api.atlas.local,atlas.local"
+  admin:
+    username: admin
+    email: admin@example.com
+    password: change-me # Change via --set-string
   db:
     host: postgres
     port: "5432"
     name: atlas_db
     user: atlas_user
+  tolerations:
+    - key: "node.kubernetes.io/disk-pressure"
+      operator: "Exists"
+      effect: "NoSchedule"
 
 frontend:
-  replicaCount: 2
+  replicaCount: 1
   image:
     repository: docker.io/xgalvanize/project-atlas-frontend
     tag: latest
+    pullPolicy: IfNotPresent
   service:
     port: 80
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
 
 ingress:
   enabled: true
   className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
   hosts:
     - host: atlas.local
       paths:
+        - path: /graphql
+          pathType: Prefix
+          serviceName: backend
+          servicePort: 8000
         - path: /
           pathType: Prefix
+          serviceName: frontend
+          servicePort: 80
     - host: api.atlas.local
       paths:
-        - path: /api
+        - path: /graphql
           pathType: Prefix
+          serviceName: backend
+          servicePort: 8000
+        - path: /static
+          pathType: Prefix
+          serviceName: backend
+          servicePort: 8000
+        - path: /admin
+          pathType: Prefix
+          serviceName: backend
+          servicePort: 8000
+
+backup:
+  enabled: true
+  schedule: "0 3 * * *"
+  image:
+    repository: postgres
+    tag: "15-alpine"
+    pullPolicy: IfNotPresent
+  pvc:
+    storage: 5Gi
+  minFreeMb: 512
+  keepLast: 10
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+
+jobs:
+  migrations:
+    enabled: false
+  superuser:
+    enabled: false

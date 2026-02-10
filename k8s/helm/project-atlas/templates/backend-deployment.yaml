@@ -18,7 +18,9 @@ spec:
       containers:
         - name: backend
           image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+          resources:
+{{ toYaml .Values.backend.resources | indent 12 }}
           ports:
             - containerPort: {{ .Values.backend.service.port }}
           env:
@@ -37,3 +39,39 @@ spec:
                 secretKeyRef:
                   name: postgres-secret
                   key: password
+            - name: ADMIN_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: django-admin-secret
+                  key: username
+            - name: ADMIN_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: django-admin-secret
+                  key: email
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: django-admin-secret
+                  key: password
+            - name: DJANGO_SUPERUSER_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: django-admin-secret
+                  key: username
+            - name: DJANGO_SUPERUSER_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: django-admin-secret
+                  key: email
+            - name: DJANGO_SUPERUSER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: django-admin-secret
+                  key: password
+            - name: ALLOWED_HOSTS
+              value: {{ .Values.backend.allowedHosts | quote }}
+{{- if .Values.backend.tolerations }}
+      tolerations:
+{{ toYaml .Values.backend.tolerations | indent 8 }}
+{{- end }}
