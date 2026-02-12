@@ -25,7 +25,7 @@ backend:
       cpu: "100m"
     limits:
       memory: "256Mi"
-  allowedHosts: "localhost,127.0.0.1,backend.project-atlas.svc.cluster.local,api.atlas.local,atlas.local"
+  allowedHosts: "localhost,127.0.0.1,10.0.0.145,backend.project-atlas.svc.cluster.local,api.atlas.local,atlas.local"
   admin:
     username: admin
     email: admin@example.com
@@ -85,6 +85,16 @@ ingress:
           pathType: Prefix
           serviceName: backend
           servicePort: 8000
+    - host: ""
+      paths:
+        - path: /graphql
+          pathType: Prefix
+          serviceName: backend
+          servicePort: 8000
+        - path: /
+          pathType: Prefix
+          serviceName: frontend
+          servicePort: 80
 
 backup:
   enabled: true
